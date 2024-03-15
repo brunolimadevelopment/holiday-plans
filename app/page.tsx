@@ -2,17 +2,17 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { dataFormSchema, VacationSchema } from "@/app/types/zod";
+import { DataFormSchemaType, VacationSchema } from "@/app/types/zod";
 import Item from './_components/Item';
 
 export default function Home() {
-  const [items, setItems] = useState<dataFormSchema[]>([]);
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<dataFormSchema>({
+  const [items, setItems] = useState<DataFormSchemaType[]>([]);
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<DataFormSchemaType>({
     resolver: zodResolver(VacationSchema)
   });
 
   useEffect(() => {
-    const storedItems = JSON.parse(localStorage.getItem('items') || '[]') as dataFormSchema[];
+    const storedItems = JSON.parse(localStorage.getItem('items') || '[]') as DataFormSchemaType[];
     if (storedItems.length > 0) {
       setItems(storedItems);
     }
@@ -22,12 +22,13 @@ export default function Home() {
     localStorage.setItem('items', JSON.stringify(items));
   }, [items]);
 
-  const onSubmit = (data: dataFormSchema) => {
+  const onSubmit = (data: DataFormSchemaType) => {
+    const { id, date, ...restData } = data;
 
     const newItem = {
       id: crypto.randomUUID(),
       date: new Date(),
-      ...data,
+      ...restData,
     }
     setItems(prevItems => [...prevItems, newItem]);
     localStorage.setItem('items', JSON.stringify([...items, data]));
@@ -41,7 +42,7 @@ export default function Home() {
     localStorage.setItem('items', JSON.stringify(newItems));
   };
 
-  const editItem = (updatedItem: dataFormSchema, index: number) => {
+  const editItem = (updatedItem: DataFormSchemaType, index: number) => {
     const newItems = [...items];
     newItems[index] = updatedItem;
     setItems(newItems);
