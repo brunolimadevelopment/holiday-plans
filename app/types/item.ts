@@ -1,9 +1,7 @@
-import { dataFormSchema } from "@/app/types/zod";
+import { DataFormSchemaType } from "@/app/types/zod";
 
-export type ItemProps = {
-    id: string;
-    date: Date;    
-    data: dataFormSchema;
+export type ItemProps = {   
+    data: DataFormSchemaType;
     onDelete: () => void;
-    onEdit: (updatedItem: dataFormSchema) => void;
+    onEdit: (updatedItem: DataFormSchemaType) => void;
 }

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns'
 import { pt } from 'date-fns/locale'
 import { useForm } from 'react-hook-form';
-import { dataFormSchema } from "@/app/types/zod";
+import { DataFormSchemaType } from "@/app/types/zod";
 import { ItemProps } from "@/app/types/item";
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -19,10 +19,10 @@ import { MdOutlineHolidayVillage } from "react-icons/md";
 
 const Item = ({ data, onDelete, onEdit }:ItemProps) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [editedItem, setEditedItem] = useState<dataFormSchema>(data);
-  const [originalItem, setOriginalItem] = useState<dataFormSchema>(data);
+  const [editedItem, setEditedItem] = useState<DataFormSchemaType>(data);
+  const [originalItem, setOriginalItem] = useState<DataFormSchemaType>(data);
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<dataFormSchema>({
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<DataFormSchemaType>({
     defaultValues: data 
   });
 
@@ -31,7 +31,7 @@ const Item = ({ data, onDelete, onEdit }:ItemProps) => {
     setEditedItem(data);
   };
 
-  const handleSave = handleSubmit((editedData: dataFormSchema) => {
+  const handleSave = handleSubmit((editedData: DataFormSchemaType) => {
     onEdit(editedData);
     setIsEditing(false);
   });
@@ -64,12 +64,16 @@ const Item = ({ data, onDelete, onEdit }:ItemProps) => {
     doc.save('holiday_plan.pdf');
   };
 
-  const renderInput = (fieldName: keyof dataFormSchema, label: string, type: string = 'text') => (
+  const renderInput = (fieldName: keyof DataFormSchemaType, label: string, type: string = 'text') => (
     <>
       {isEditing ? (
         <>
           <input
-            defaultValue={editedItem[fieldName]}
+            defaultValue={
+              editedItem[fieldName] instanceof Date
+                ? (editedItem[fieldName] as Date).toISOString().substr(0, 10)
+                : String(editedItem[fieldName])
+            }
             {...register(fieldName, {
               required: true
             })}

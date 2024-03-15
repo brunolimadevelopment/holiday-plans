@@ -1,5 +1,9 @@
 import { z } from 'zod';
 
+export interface VacationData {
+    id: string;
+    date: Date;
+}
 export const VacationSchema = z.object({
     title: z.string().trim().min(1),
     description: z.string().trim().min(1),
@@ -9,4 +13,9 @@ export const VacationSchema = z.object({
     participants: z.string().min(1),
 });
 
-export type dataFormSchema = z.infer<typeof VacationSchema>
+export const CompleteVacationSchema = VacationSchema.merge(z.object({
+    id: z.string(),
+    date: z.date(),
+}));
+
+export type DataFormSchemaType = z.infer<typeof CompleteVacationSchema>;
