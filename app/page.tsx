@@ -23,7 +23,13 @@ export default function Home() {
   }, [items]);
 
   const onSubmit = (data: dataFormSchema) => {
-    setItems(prevItems => [...prevItems, data]);
+
+    const newItem = {
+      id: crypto.randomUUID(),
+      date: new Date(),
+      ...data,
+    }
+    setItems(prevItems => [...prevItems, newItem]);
     localStorage.setItem('items', JSON.stringify([...items, data]));
     reset();
   };
@@ -43,82 +49,74 @@ export default function Home() {
   };
 
   return (
-    <div className="w-full h-screen flex flex-col items-center mt-28">
-      <h1 className="font-semibold text-2xl mb-7">Create your Holiday Plan</h1>
-      <form onSubmit={handleSubmit(onSubmit)} className="w-96 px-4 mb-8">
-        <div className="mb-4">
-          <input 
-            {...register("title", { 
-                required: true,                               
-            })}
-            type="text" 
-            placeholder="Title" 
-            className={`block w-full px-2 h-9 font-nunito text-sm leading-5 placeholder:text-gray-light text-black sm:text-sm sm:leading-6 ${errors?.title && 'border-2 border-red-500' }`}
-            />
-            {errors.title && <span className="text-red-600 mt-1 flex font-medium">The title field is required.</span>}
-        </div>
-        <div className="mb-4">
-          <textarea 
-            {...register("description", { required: true })}
-            placeholder="Description"
-            className={`block w-full px-2 h-9 font-nunito text-sm leading-5 placeholder:text-gray-light text-black sm:text-sm sm:leading-6 ${errors.description ? 'border-2 border-red-500' : ''}`}/>
-            {errors.description && <span className="text-red-600 mt-1 flex font-medium">The description field is required.</span>}
-        </div>
-        <div className="mb-4">
-          <input 
-            {...register("startDate", { required: true })}
-            type="date" 
-            placeholder="startDate"
-            className={`block w-full px-2 h-9 font-nunito text-sm leading-5 placeholder:text-gray-light text-black sm:text-sm sm:leading-6 ${errors.startDate ? 'border-2 border-red-500' : ''}`}/>
-            {errors.startDate && <span className="text-red-600 mt-1 flex font-medium">The startDate field is required.</span>}
-        </div>
-        <div className="mb-4">
-          <input 
-            {...register("endDate", { required: true })}
-            type="date" 
-            placeholder="endDate"
-            className={`block w-full px-2 h-9 font-nunito text-sm leading-5 placeholder:text-gray-light text-black sm:text-sm sm:leading-6 ${errors.endDate ? 'border-2 border-red-500' : ''}`}/>
-            {errors.endDate && <span className="text-red-600 mt-1 flex font-medium">The endDate field is required.</span>}
-        </div>
-        <div className="mb-4">
-          <input 
-            {...register("location", { required: true })}
-            type="text" 
-            placeholder="location"
-            className={`block w-full px-2 h-9 font-nunito text-sm leading-5 placeholder:text-gray-light text-black sm:text-sm sm:leading-6 ${errors.location ? 'border-2 border-red-500' : ''}`}/>
-            {errors.location && <span className="text-red-600 mt-1 flex font-medium">The location field is required.</span>}
-        </div>
-        <div className="mb-4">
-          <textarea 
-            {...register("participants", { required: true })}
-            placeholder="participants"
-            className={`block w-full px-2 h-9 font-nunito text-sm leading-5 placeholder:text-gray-light text-black sm:text-sm sm:leading-6 ${errors.participants ? 'border-2 border-red-500' : ''}`}/>
-            {errors.participants && <span className="text-red-600 mt-1 flex font-medium">The participants field is required.</span>}
-        </div>
-        <input
-          type="submit"
-          className="xl:w-32 w-full bg-blue-600 text-white p-2 rounded-md cursor-pointer hover:bg-blue-700"
-          value="Create"
-        />
-      </form>
-      <table className="w-fulls md:w-full lg:w-full xl:w-full border-collapse">
-        <thead>
-          <tr>
-            <th className="py-2 bg-gray-200 border text-left">Title</th>
-            <th className="py-2 bg-gray-200 border text-left">Description</th>
-            <th className="py-2 bg-gray-200 border text-left">Location</th>
-            <th className="py-2 bg-gray-200 border text-left">Start Date</th>
-            <th className="py-2 bg-gray-200 border text-left">End Date</th>
-            <th className="py-2 bg-gray-200 border text-left">Participants</th>
-            <th className="py-2 bg-gray-200 border text-left">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {items.map((item, index) => (
-            <Item key={index} data={item} onDelete={() => deleteItem(index)} onEdit={(updatedItem) => editItem(updatedItem, index)} />
-          ))}
-        </tbody>
-      </table>
+    <div className="w-full h-screen flex flex-col items-center mt-7">
+      <ul className="w-auto grid sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="h-fit max-w-full border w-96 p-4 rounded-md">
+          <h3 className="mb-3 font-semibold text-2xl">Create your Holiday Plan</h3>
+          <div className="mb-3">
+            <input 
+              {...register("title", { 
+                  required: true,                               
+              })}
+              type="text" 
+              placeholder="Title" 
+              className={`w-full h-9 rounded-sm font-nunito border px-2 text-sm leading-5 placeholder:text-gray-light text-black sm:text-sm sm:leading-6 ${errors?.title && 'border-2 border-red-500' }`}
+              />
+              {errors.title && <span className="text-red-600 mt-1 flex font-normal text-sm">The field is required.</span>}
+          </div>
+          <div className="mb-4">
+            <textarea 
+              {...register("description", { required: true })}
+              placeholder="Description"
+              className={`resize-none w-full h-9 rounded-sm font-nunito border px-2 text-sm leading-5 placeholder:text-gray-light text-black sm:text-sm sm:leading-6 ${errors.description ? 'border-2 border-red-500' : ''}`}/>
+              {errors.description && <span className="text-red-600 mt-1 flex font-normal text-sm">The field is required.</span>}
+          </div>
+          <div className="mb-4 flex justify-between">
+            <div className="flex flex-col w-3/5 mr-6">
+              <label className="text-sm text-gray-500">Start Date</label>
+              <input 
+                {...register("startDate", { required: true })}
+                type="date" 
+                placeholder=""
+                className={`w-full h-9 rounded-sm font-nunito border px-2 text-sm leading-5 placeholder:text-gray-light text-black sm:text-sm sm:leading-6 ${errors.startDate ? 'border-2 border-red-500' : ''}`}/>
+                {errors.startDate && <span className="text-red-600 mt-1 flex font-normal text-sm">The field is required.</span>}
+            </div>
+            <div className="flex flex-col w-3/5">
+              <label className="text-sm text-gray-500">End Date</label>
+              <input 
+                {...register("endDate", { required: true })}
+                type="date" 
+                placeholder="endDate"
+                className={`w-full h-9 rounded-sm font-nunito border px-2 text-sm leading-5 placeholder:text-gray-light text-black sm:text-sm sm:leading-6 ${errors.endDate ? 'border-2 border-red-500' : ''}`}/>
+                {errors.endDate && <span className="text-red-600 mt-1 flex font-normal text-sm">The field is required.</span>}
+            </div>
+          </div>
+          <div className="mb-4">
+            <input 
+              {...register("location", { required: true })}
+              type="text" 
+              placeholder="location"
+              className={`w-full h-9 rounded-sm font-nunito border px-2 text-sm leading-5 placeholder:text-gray-light text-black sm:text-sm sm:leading-6 ${errors.location ? 'border-2 border-red-500' : ''}`}/>
+              {errors.location && <span className="text-red-600 mt-1 flex font-normal text-sm">The field is required.</span>}
+          </div>
+          <div className="mb-4">
+            <textarea 
+              {...register("participants", { required: true })}
+              placeholder="participants"
+              className={`resize-none w-full h-9 rounded-sm font-nunito border px-2 text-sm leading-5 placeholder:text-gray-light text-black sm:text-sm sm:leading-6 ${errors.participants ? 'border-2 border-red-500' : ''}`}/>
+              {errors.participants && <span className="text-red-600 mt-1 flex font-normal text-sm">The field is required.</span>}
+          </div>
+          <input
+            type="submit"
+            className="w-full bg-blue-600 text-white p-2 rounded-md cursor-pointer hover:bg-blue-700"
+            value="Create"
+          />
+        </form>
+      
+        {items.map((item, index) => (
+          <Item key={index} data={item} onDelete={() => deleteItem(index)} onEdit={(updatedItem) => editItem(updatedItem, index)} />
+        ))}
+      </ul>
     </div>
   );
 }

@@ -9,4 +9,4 @@ export const VacationSchema = z.object({
     participants: z.string().min(1),
 });
 
-export type dataFormSchema =  z.infer<typeof VacationSchema>
+export type dataFormSchema = z.infer<typeof VacationSchema>

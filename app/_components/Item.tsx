@@ -1,10 +1,21 @@
 "use client"
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { formatDistanceToNow } from 'date-fns'
+import { pt } from 'date-fns/locale'
 import { useForm } from 'react-hook-form';
 import { dataFormSchema } from "@/app/types/zod";
 import { ItemProps } from "@/app/types/item";
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { RiEditBoxLine } from "react-icons/ri";
+import { CiTrash } from "react-icons/ci";
+import { ImFilePdf } from "react-icons/im";
+import { CiSquareCheck } from "react-icons/ci";
+import { MdOutlineCancel } from "react-icons/md";
+import { CiLocationOn } from "react-icons/ci";
+import { CiCalendarDate } from "react-icons/ci";
+import { GoPeople } from "react-icons/go";
+import { MdOutlineHolidayVillage } from "react-icons/md";
 
 const Item = ({ data, onDelete, onEdit }:ItemProps) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -12,7 +23,7 @@ const Item = ({ data, onDelete, onEdit }:ItemProps) => {
   const [originalItem, setOriginalItem] = useState<dataFormSchema>(data);
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<dataFormSchema>({
-    defaultValues: data // Definindo os valores padrão
+    defaultValues: data 
   });
 
   const handleEdit = () => {
@@ -54,7 +65,7 @@ const Item = ({ data, onDelete, onEdit }:ItemProps) => {
   };
 
   const renderInput = (fieldName: keyof dataFormSchema, label: string, type: string = 'text') => (
-    <td>
+    <>
       {isEditing ? (
         <>
           <input
@@ -63,41 +74,52 @@ const Item = ({ data, onDelete, onEdit }:ItemProps) => {
               required: true
             })}
             type={type}
-            className={`block w-full px-2 h-9 font-nunito text-sm leading-5 placeholder:text-gray-light text-black sm:text-sm sm:leading-6 ${errors[fieldName] ? 'border-2 border-red-500' : ''}`}
+            className={`rounded-sm block bg-gray-100 px-2 w-full h-9 font-nunito text-sm leading-5 placeholder:text-gray-light text-black sm:text-sm sm:leading-6 ${errors[fieldName] ? 'border-2 border-red-500' : ''}`}
           />
           {errors[fieldName] && (
-            <span className="text-red-600 mt-1 flex font-medium">{label} field is required.</span>
+            <span className="text-red-600 mt-1 flex font-medium text-sm">{label} field is required.</span>
           )}
         </>
       ) : (
         data[fieldName]
       )}
-    </td>
+    </>
   );
 
   return (
-    <tr className={isEditing ? 'bg-gray-300 h-14' : ''}>
-      {renderInput("title", "Title")}
-      {renderInput("description", "Description", "textarea")}
-      {renderInput("location", "Location")}
-      {renderInput("startDate", "Start Date", "date")}
-      {renderInput("endDate", "End Date", "date")}
-      {renderInput("participants", "Participants")}
-      <td>
+    <li className={isEditing ? 'border w-96 p-6' : 'h-fit max-w-full border w-96 p-6 rounded-md'}>
+      <div>
+        <h2 className="font-sans font-semibold text-2xl flex items-center"><MdOutlineHolidayVillage className="mr-2" /> Holiday Plan</h2>
+        <span className="mb-3 italic font-semibold text-xs text-slate-400">Hash: {data.id}</span>
+      </div>
+      <span className="text-sm font-medium text-slate-300">{formatDistanceToNow(data.date, { locale: pt, addSuffix: true})}</span>
+      <hr className="my-4" />
+      <p className="mb-3"><h3 className="font-semibold text-lg">{renderInput("title", "Title")}</h3></p>
+      <p className="mb-3">{renderInput("description", "Description", "textarea")}</p>
+      <hr className="my-4" />
+      <div className="flex justify-between">
+        <p className="w-full mb-3 flex items-center font-sans"><CiCalendarDate className="mr-2"/><div>{renderInput("startDate", "Start Date", "date")}</div></p> 
+        <p className="w-full mb-3 flex items-center justify-end font-sans"><CiCalendarDate className="mr-2"/><div>{renderInput("endDate", "End Date", "date")}</div></p>
+      </div>
+      <div className="flex justify-between">
+        <p className="w-full mb-3 flex items-center font-sans"><CiLocationOn className="mr-2"/><div>{renderInput("location", "Location")}</div></p> 
+        <p className="w-full mb-3 flex items-center justify-end font-sans"><GoPeople className="mr-2" /><div>{renderInput("participants", "Participants")}</div></p>
+      </div>
+      <div className="mt-3 flex items-center">
         {isEditing ? (
           <>
-            <button className="bg-green-500 w-full px-4 py-1 text-white rounded mr-1 hover:bg-green-600" onClick={handleSave}>Save</button>
-            <button className="bg-red-500 w-full px-4 py-1 text-white rounded hover:bg-red-600" onClick={handleCancel}>Cancel</button>
+            <button className="bg-green-500 w-full px-4 py-1 text-white rounded mr-1 flex items-center justify-center hover:bg-green-600" onClick={handleSave}><CiSquareCheck className="mr-2"/> Save</button>
+            <button className="bg-red-500 w-full px-4 py-1 text-white rounded flex items-center justify-center hover:bg-red-600" onClick={handleCancel}><MdOutlineCancel className="mr-2"/> Cancel</button>
           </>
         ) : (
           <>
-            <button className="bg-yellow-500 w-full px-4 py-1 text-white rounded mr-1 hover:bg-yellow-600 mb-1 xl:w-auto xl:mb-0" onClick={handleEdit}>Edit</button>
-            <button className="bg-red-500 w-full px-4 py-1 text-white rounded mr-1 hover:bg-red-600 mb-1 xl:w-auto xl:mb-0" onClick={onDelete}>Delete</button>
-            <button className="bg-blue-500 w-full px-4 py-1 text-white rounded hover:bg-blue-600 mb-1 xl:w-auto xl:mb-0" onClick={() => handleGeneratePDF()}>PDF</button>
+            <button className="bg-yellow-500 w-full px-4 py-1 text-white rounded mr-1 flex items-center justify-evenly hover:bg-yellow-600" onClick={handleEdit}><RiEditBoxLine /> Edit</button>
+            <button className="bg-red-500 w-full px-4 py-1 text-white rounded mr-1 flex items-center justify-evenly hover:bg-red-600" onClick={onDelete}><CiTrash /> Delete</button>
+            <button className="bg-blue-500 w-full px-4 py-1 text-white rounded flex items-center justify-evenly hover:bg-blue-600" onClick={() => handleGeneratePDF()}><ImFilePdf /> PDF</button>
           </>
         )}
-      </td>
-    </tr>
+      </div>
+    </li>
   );
 };
 
